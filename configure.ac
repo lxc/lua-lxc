@@ -18,6 +18,27 @@ AC_GNU_SOURCE
 LT_INIT
 AC_SUBST([LIBTOOL_DEPS])
 
+# Not in older autoconf versions
+# AS_VAR_COPY(DEST, SOURCE)
+# -------------------------
+# Set the polymorphic shell variable DEST to the contents of the polymorphic
+# shell variable SOURCE.
+m4_ifdef([AS_VAR_COPY], [],
+[AC_DEFUN([AS_VAR_COPY],
+    [AS_LITERAL_IF([$1[]$2], [$1=$$2], [eval $1=\$$2])])
+])
+
+dnl PKG_CHECK_VAR was introduced with pkg-config 0.28
+m4_ifdef([PKG_CHECK_VAR], [],
+[AC_DEFUN([PKG_CHECK_VAR],
+    [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+     AC_ARG_VAR([$1], [value of $3 for $2, overriding pkg-config])dnl
+     _PKG_CONFIG([$1], [variable="][$3]["], [$2])
+     AS_VAR_COPY([$1], [pkg_cv_][$1])
+     AS_VAR_IF([$1], [""], [$5], [$4])dnl
+    ])# PKG_CHECK_VAR
+])
+
 AC_ARG_ENABLE([werror],
 	[AC_HELP_STRING([--disable-werror],
 	[do not treat warnings as errors])],
@@ -63,27 +84,6 @@ PKG_CHECK_VAR([LUA_VERSION], [$LUAPKGCONFIG], [V],,
 AC_MSG_RESULT([$LUA_VERSION])
 AC_SUBST([LUA_LIBDIR], [$libdir/lua/$LUA_VERSION])
 AC_SUBST([LUA_SHAREDIR], [$datadir/lua/$LUA_VERSION])
-
-# Not in older autoconf versions
-# AS_VAR_COPY(DEST, SOURCE)
-# -------------------------
-# Set the polymorphic shell variable DEST to the contents of the polymorphic
-# shell variable SOURCE.
-m4_ifdef([AS_VAR_COPY], [],
-[AC_DEFUN([AS_VAR_COPY],
-    [AS_LITERAL_IF([$1[]$2], [$1=$$2], [eval $1=\$$2])])
-])
-
-dnl PKG_CHECK_VAR was introduced with pkg-config 0.28
-m4_ifdef([PKG_CHECK_VAR], [],
-[AC_DEFUN([PKG_CHECK_VAR],
-    [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
-     AC_ARG_VAR([$1], [value of $3 for $2, overriding pkg-config])dnl
-     _PKG_CONFIG([$1], [variable="][$3]["], [$2])
-     AS_VAR_COPY([$1], [pkg_cv_][$1])
-     AS_VAR_IF([$1], [""], [$5], [$4])dnl
-    ])# PKG_CHECK_VAR
-])
 
 # Expand some useful variables
 AS_AC_EXPAND(PREFIX, "$prefix")
