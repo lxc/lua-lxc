@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([lua-lxc], [3.0.0])
+AC_INIT([lua-lxc], [3.0.2])
 
 # We need pkg-config
 PKG_PROG_PKG_CONFIG
